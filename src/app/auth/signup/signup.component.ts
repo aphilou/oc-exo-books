@@ -1,15 +1,45 @@
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AuthService } from 'src/app/services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-signup',
   templateUrl: './signup.component.html',
-  styleUrls: ['./signup.component.scss']
+  styleUrls: [ './signup.component.scss' ]
 })
 export class SignupComponent implements OnInit {
 
-  constructor() { }
+  signUpForm: FormGroup;
+  errorMessage: string;
+
+  constructor(
+    private formBuilder: FormBuilder,
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
+    this.initForm();
   }
 
+  initForm(): void {
+    this.signUpForm = this.formBuilder.group({
+      email: [ '', [ Validators.required, Validators.email]],
+      password: [ '', [ Validators.required, Validators.pattern(/[0-9a-zA-Z]{6,}/)]]
+    });
+  }
+
+  onSubmit() {
+    const email = this.signUpForm.get('email').value;
+    const passwd = this.signUpForm.get('password').value;
+    this.authService.createNewUser(email, passwd).then(
+      () => {
+        this.router.navigate([ '/books' ]);
+      },
+      (error: any) => {
+        this.errorMessage = error;
+      }
+    );
+  }
 }

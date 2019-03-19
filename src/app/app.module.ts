@@ -11,16 +11,18 @@ import { BookListViewComponent } from './book-list-view/book-list-view.component
 import { BookViewComponent } from './book-list-view/book-view/book-view.component';
 import { BookFormComponent } from './book-list-view/book-form/book-form.component';
 import { HeaderComponent } from './header/header.component';
-import { AuthGuardService } from './services/auth-guard.service';
+import { AuthService } from './services/auth.service';
 import { BooksService } from './services/books.service';
+import { AuthGuard } from './services/auth.guard';
 
 
 const routes: Routes = [
   { path: 'auth/signup', component: SignupComponent },
   { path: 'auth/signin', component: SigninComponent },
-  { path: 'books', component: BookListViewComponent },
-  { path: 'books/create', component: BookFormComponent },
-  { path: 'books/detail/:id', component: BookViewComponent },
+  { path: 'books', canActivate: [ AuthGuard ], component: BookListViewComponent },
+  { path: 'books/create', canActivate: [ AuthGuard ], component: BookFormComponent },
+  { path: 'books/detail/:id', canActivate: [ AuthGuard ], component: BookViewComponent },
+  { path: '', redirectTo: 'books', pathMatch: 'full' },
   { path: '**', pathMatch: 'full', redirectTo: 'auth/signup' }
 ];
 
@@ -45,7 +47,8 @@ export const appRouting = RouterModule.forRoot(routes);
     RouterModule.forRoot(routes)
   ],
   providers: [
-    AuthGuardService,
+    AuthService,
+    AuthGuard,
     BooksService
   ],
   bootstrap: [AppComponent]
